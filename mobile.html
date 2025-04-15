@@ -2,15 +2,15 @@
 <html>
 <head>
   <title>Mobile Attendance</title>
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 </head>
 <body>
-  <h1>Attendance Page</h1>
-  <button onclick="markAttendance()">Mark Attendance</button>
-  <p id="status"></p>
+  <h1>✅ Attendance Marked Successfully!</h1>
 
   <script>
+    // Firebase configuration (same as laptop.html)
     const firebaseConfig = {
       apiKey: "AIzaSyBENDNpKZPR40mg4HhhhhiQyoz08Sq4yO8",
       authDomain: "qr-code-based-attendance-befb1.firebaseapp.com",
@@ -22,21 +22,14 @@
       measurementId: "G-D7KGGZCQ4E"
     };
 
+    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    function markAttendance() {
-      db.ref("attendance/").set({
-        marked: true
-      }, (error) => {
-        const statusEl = document.getElementById("status");
-        if (error) {
-          statusEl.textContent = "Failed to mark attendance!";
-        } else {
-          statusEl.textContent = "Attendance Marked!";
-        }
-      });
-    }
+    // ✅ Mark attendance as true
+    db.ref("attendance/").set({
+      marked: true
+    });
   </script>
 </body>
 </html>
