@@ -1,10 +1,40 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>QR Attendance</title>
+  <title>QR Attendance - Laptop</title>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js"></script>
 </head>
 <body style="text-align:center; font-family:sans-serif;">
-  <h1>📲 Scan to Mark Attendance</h1>
-  <img src="qr.png" alt="QR Code" width="300">
+  <h1 id="status">📲 Waiting for Attendance...</h1>
+
+  <!-- QR Code Image to be Scanned by Mobile -->
+  <img src="qr.png" alt="Scan to Mark Attendance" style="width: 250px; height: 250px;">
+
+  <script>
+    // Your Firebase config (replace with your actual Firebase config)
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "your-app.firebaseapp.com",
+      databaseURL: "https://your-app.firebaseio.com",
+      projectId: "your-app",
+      storageBucket: "your-app.appspot.com",
+      messagingSenderId: "xxxxxx",
+      appId: "xxxxxx"
+    };
+
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // Listen for attendance status updates in real-time
+    firebase.database().ref("attendance/status").on("value", (snapshot) => {
+      const status = snapshot.val();
+      if (status === "marked") {
+        document.getElementById("status").innerHTML = "✅ Attendance Marked!";
+      }
+    });
+  </script>
 </body>
 </html>
