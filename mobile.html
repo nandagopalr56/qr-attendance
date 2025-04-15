@@ -1,15 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mobile Attendance</title>
-  <script type="module">
-    // Import the necessary Firebase functions
-    import { initializeApp } from "firebase/app";
-    import { getDatabase, ref, set } from "firebase/database";
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+</head>
+<body>
+  <h1>Attendance Page</h1>
+  <button onclick="markAttendance()">Mark Attendance</button>
+  <p id="status"></p>
 
-    // Your Firebase configuration
+  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyBENDNpKZPR40mg4HhhhhiQyoz08Sq4yO8",
       authDomain: "qr-code-based-attendance-befb1.firebaseapp.com",
@@ -21,28 +22,21 @@
       measurementId: "G-D7KGGZCQ4E"
     };
 
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-    // Mark attendance in Firebase when the QR code is scanned
     function markAttendance() {
-      const attendanceRef = ref(db, 'attendance/');
-      set(attendanceRef, {
+      db.ref("attendance/").set({
         marked: true
-      }).then(() => {
-        console.log("Attendance marked in Firebase");
-      }).catch((error) => {
-        console.error("Error marking attendance: ", error);
+      }, (error) => {
+        const statusEl = document.getElementById("status");
+        if (error) {
+          statusEl.textContent = "Failed to mark attendance!";
+        } else {
+          statusEl.textContent = "Attendance Marked!";
+        }
       });
     }
-
-    // Simulate QR code scan by calling markAttendance() when button is clicked
-    document.getElementById('scanButton').addEventListener('click', markAttendance);
   </script>
-</head>
-<body>
-  <h1>Mobile Attendance</h1>
-  <button id="scanButton">Scan QR Code and Mark Attendance</button>
 </body>
 </html>
