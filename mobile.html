@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mobile Page</title>
+  <title>Mobile Attendance</title>
+  <script type="module">
+    // Import the necessary Firebase functions
+    import { initializeApp } from "firebase/app";
+    import { getDatabase, ref, set } from "firebase/database";
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-database.js"></script>
-
-  <script>
     // Your Firebase configuration
     const firebaseConfig = {
       apiKey: "AIzaSyBENDNpKZPR40mg4HhhhhiQyoz08Sq4yO8",
       authDomain: "qr-code-based-attendance-befb1.firebaseapp.com",
+      databaseURL: "https://qr-code-based-attendance-befb1-default-rtdb.firebaseio.com",
       projectId: "qr-code-based-attendance-befb1",
       storageBucket: "qr-code-based-attendance-befb1.firebasestorage.app",
       messagingSenderId: "636789197305",
@@ -22,24 +22,27 @@
     };
 
     // Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
-    // Update attendance status to "marked"
+    // Mark attendance in Firebase when the QR code is scanned
     function markAttendance() {
-      firebase.database().ref('attendance').set({
-        status: "marked"
+      const attendanceRef = ref(db, 'attendance/');
+      set(attendanceRef, {
+        marked: true
+      }).then(() => {
+        console.log("Attendance marked in Firebase");
+      }).catch((error) => {
+        console.error("Error marking attendance: ", error);
       });
     }
 
-    // Call this function to mark the attendance
-    window.onload = function() {
-      markAttendance();
-    };
+    // Simulate QR code scan by calling markAttendance() when button is clicked
+    document.getElementById('scanButton').addEventListener('click', markAttendance);
   </script>
 </head>
 <body>
-  <h1>Mobile Page</h1>
-  <p>Attendance is marked now.</p>
+  <h1>Mobile Attendance</h1>
+  <button id="scanButton">Scan QR Code and Mark Attendance</button>
 </body>
 </html>
