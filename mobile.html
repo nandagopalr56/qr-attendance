@@ -2,19 +2,31 @@
 <html>
 <head>
   <title>Attendance Marked</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin-top: 100px;
-    }
-    h1 {
-      color: green;
-    }
-  </style>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js"></script>
 </head>
-<body>
+<body style="text-align:center; font-family:sans-serif;">
   <h1>✅ Attendance Marked</h1>
-  <p>Thank you! Your attendance has been recorded.</p>
+
+  <script>
+    // Your Firebase config (same as laptop.html)
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "your-app.firebaseapp.com",
+      databaseURL: "https://your-app.firebaseio.com",
+      projectId: "your-app",
+      storageBucket: "your-app.appspot.com",
+      messagingSenderId: "xxxxxx",
+      appId: "xxxxxx"
+    };
+
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // Update the attendance status when the mobile page is loaded
+    firebase.database().ref("attendance/status").set("marked");
+  </script>
 </body>
 </html>
