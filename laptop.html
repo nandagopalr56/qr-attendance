@@ -1,15 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Laptop Attendance</title>
-  <script type="module">
-    // Import the necessary Firebase functions
-    import { initializeApp } from "firebase/app";
-    import { getDatabase, ref, onValue } from "firebase/database";
+  <!-- Firebase SDK (Compat version for easy use without import/export) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+</head>
+<body>
+  <h1>Scan QR Code to Mark Attendance</h1>
 
-    // Your Firebase configuration
+  <!-- ✅ Display QR Code image -->
+  <img src="qr.png" alt="QR Code" width="300">
+
+  <h2>Attendance Status</h2>
+  <p id="attendanceStatus">Waiting for attendance...</p>
+
+  <script>
+    // Firebase configuration
     const firebaseConfig = {
       apiKey: "AIzaSyBENDNpKZPR40mg4HhhhhiQyoz08Sq4yO8",
       authDomain: "qr-code-based-attendance-befb1.firebaseapp.com",
@@ -22,28 +29,21 @@
     };
 
     // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-    // Listen for changes in attendance status
-    function listenForAttendance() {
-      const attendanceRef = ref(db, 'attendance/');
-      onValue(attendanceRef, (snapshot) => {
-        const data = snapshot.val();
-        if (data && data.marked) {
-          // Display attendance status when it's marked
-          document.getElementById('attendanceStatus').textContent = 'Attendance Marked';
-        }
-      });
-    }
-
-    // Call the function to listen for attendance updates
-    listenForAttendance();
+    // Listen for attendance status changes
+    db.ref("attendance/").on("value", (snapshot) => {
+      const data = snapshot.val();
+      const statusEl = document.getElementById("attendanceStatus");
+      if (data && data.marked === true) {
+        statusEl.textContent = "✅ Attendance Marked!";
+        statusEl.style.color = "green";
+      } else {
+        statusEl.textContent = "⏳ Waiting for attendance...";
+        statusEl.style.color = "black";
+      }
+    });
   </script>
-</head>
-<body>
-  <img src="qr.png">
-  <h1>Attendance Status</h1>
-  <p id="attendanceStatus">Waiting for attendance...</p>
 </body>
 </html>
