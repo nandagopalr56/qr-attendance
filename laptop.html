@@ -1,18 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Laptop QR Display</title>
-  <!-- Firebase SDK -->
+  <title>Laptop Attendance Display</title>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 </head>
 <body>
-  <h2>Scan this QR Code to Mark Attendance</h2>
-  <img src="qr.png" alt="QR Code" width="200" height="200"><br><br>
-  <h3 id="status">Waiting for scan...</h3>
+  <h1 id="status">Waiting for Scan...</h1>
+  <p id="timestamp"></p>
+
+  <img src="qr.png" width="200" alt="QR Code">
 
   <script>
-    // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyBENDNpKZPR40mg4HhhhhiQyoz08Sq4yO8",
       authDomain: "qr-code-based-attendance-befb1.firebaseapp.com",
@@ -27,14 +26,14 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Listen for attendance changes
-    const statusText = document.getElementById("status");
-    db.ref("attendance/status").on("value", (snapshot) => {
-      const marked = snapshot.val();
-      if (marked === true) {
-        statusText.textContent = "✅ Attendance Marked!";
+    db.ref("attendance").on("value", (snapshot) => {
+      const data = snapshot.val();
+      if (data && data.status === true) {
+        document.getElementById("status").innerText = "✅ Attendance Marked!";
+        document.getElementById("timestamp").innerText = "🕒 " + data.timestamp;
       } else {
-        statusText.textContent = "Waiting for scan...";
+        document.getElementById("status").innerText = "Waiting for Scan...";
+        document.getElementById("timestamp").innerText = "";
       }
     });
   </script>
