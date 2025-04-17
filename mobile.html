@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Attendance Marked</title>
-    <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-database.js"></script>
+    <!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.8.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.8.1/firebase-database.js"></script>
+
 </head>
 <body>
     <h2>Attendance Marked</h2>
@@ -27,24 +29,25 @@
         const app = firebase.initializeApp(firebaseConfig);
         const database = firebase.database(app);
 
-        // Function to push attendance data to Firebase
-        function markAttendance() {
-            const now = new Date();
-            const date = now.toLocaleDateString(); // e.g., "4/17/2025"
-            const time = now.toLocaleTimeString(); // e.g., "10:15:00 PM"
+        // Function to mark attendance and push data to Firebase
+function markAttendance() {
+  const date = new Date();
+  const dateString = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+  const timeString = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()} ${date.getHours() >= 12 ? 'PM' : 'AM'}`;
 
-            // Pushing to Firebase under 'attendance' node
-            const attendanceRef = database.ref('attendance');
-            attendanceRef.push({
-                date: date,
-                time: time,
-                status: "Marked"
-            }).then(() => {
-                alert('Attendance has been marked!');
-            }).catch((error) => {
-                console.error("Error marking attendance: ", error);
-            });
-        }
+  // Push attendance data to Firebase
+  const attendanceRef = db.ref('attendance/' + new Date().getTime()); // Using timestamp as key
+  attendanceRef.set({
+    date: dateString,
+    time: timeString,
+    status: 'Marked'
+  }).then(() => {
+    alert("Attendance Marked!");
+  }).catch((error) => {
+    console.error("Error marking attendance: ", error);
+  });
+}
+
 
         // Call markAttendance function (you can trigger it on any event like button click)
         markAttendance();
