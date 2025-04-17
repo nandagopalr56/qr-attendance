@@ -4,41 +4,29 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Laptop Attendance</title>
-
-  <!-- QR Code Library -->
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.4.4/build/qrcode.min.js"></script>
-
-  <style>
-    #qr-code {
-      margin: 20px;
-      width: 200px;
-      height: 200px;
-      border: 2px solid black;
-    }
-  </style>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-  <h2>Attendance System</h2>
-  <h3>Scan the QR code from mobile to mark attendance</h3>
-  
-  <!-- QR Code Display -->
-  <div id="qr-code"></div>
-
-  <h4 id="status">Waiting for scan...</h4>
+  <h1>QR Code for Attendance</h1>
+  <div id="qrcode"></div> <!-- This is where the QR code will be displayed -->
+  <button id="markAttendance">Mark Attendance</button> <!-- Button to manually mark attendance -->
+  <p id="status"></p> <!-- Status message -->
 
   <script>
-    // Generate Dynamic QR Code (Every time the page is refreshed)
-    const uniqueCode = new Date().getTime();  // Use the current timestamp as unique code
-    const qrCodeElement = document.getElementById('qr-code');
-    
-    // Generate QR code using the dynamic value
-    QRCode.toCanvas(qrCodeElement, uniqueCode, function (error) {
-      if (error) {
-        console.error(error);
-        return;
-      }
-      console.log('QR Code generated!');
-    });
-  </script>
-</body>
-</html>
+    // Generate Dynamic QR Code
+    function generateQRCode(content) {
+      QRCode.toCanvas(document.getElementById('qrcode'), content, function (error) {
+        if (error) console.error(error);
+        console.log('QR Code Generated!');
+      });
+    }
+
+    // Default message for the QR code when the page loads
+    let attendanceMarked = false;
+
+    // Function to simulate marking attendance
+    function markAttendance() {
+      attendanceMarked = !attendanceMarked; // Toggle attendance status
+
+      //
