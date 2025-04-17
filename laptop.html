@@ -1,52 +1,40 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Laptop Attendance</title>
+  <title>Laptop QR Display</title>
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 </head>
 <body>
-  <h1>Scan QR Code to Mark Attendance</h1>
-
-  <!-- ✅ Display QR Code Image -->
-  <img src="qr.png" alt="QR Code" width="300">
-
-  <h2>Attendance Status</h2>
-  <p id="attendanceStatus">⏳ Waiting for attendance...</p>
+  <h2>Scan this QR Code to Mark Attendance</h2>
+  <img src="qr.png" alt="QR Code" width="200" height="200"><br><br>
+  <h3 id="status">Waiting for scan...</h3>
 
   <script>
-    // Firebase configuration
+    // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyBENDNpKZPR40mg4HhhhhiQyoz08Sq4yO8",
       authDomain: "qr-code-based-attendance-befb1.firebaseapp.com",
       databaseURL: "https://qr-code-based-attendance-befb1-default-rtdb.firebaseio.com",
       projectId: "qr-code-based-attendance-befb1",
-      storageBucket: "qr-code-based-attendance-befb1.firebasestorage.app",
+      storageBucket: "qr-code-based-attendance-befb1.appspot.com",
       messagingSenderId: "636789197305",
       appId: "1:636789197305:web:646fe72e8219ebd029d528",
       measurementId: "G-D7KGGZCQ4E"
     };
 
-    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // 🔁 Reset status when laptop page loads
-    db.ref("attendance/").set({
-      marked: false
-    });
-
-    // 👂 Listen for changes in attendance status
-    db.ref("attendance/").on("value", (snapshot) => {
-      const data = snapshot.val();
-      const statusEl = document.getElementById("attendanceStatus");
-      if (data && data.marked === true) {
-        statusEl.textContent = "✅ Attendance Marked!";
-        statusEl.style.color = "green";
+    // Listen for attendance changes
+    const statusText = document.getElementById("status");
+    db.ref("attendance/status").on("value", (snapshot) => {
+      const marked = snapshot.val();
+      if (marked === true) {
+        statusText.textContent = "✅ Attendance Marked!";
       } else {
-        statusEl.textContent = "⏳ Waiting for attendance...";
-        statusEl.style.color = "black";
+        statusText.textContent = "Waiting for scan...";
       }
     });
   </script>
