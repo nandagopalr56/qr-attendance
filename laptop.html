@@ -53,7 +53,10 @@
     
     // Generate QR code using the dynamic value
     QRCode.toCanvas(qrCodeElement, uniqueCode, function (error) {
-      if (error) console.error(error);
+      if (error) {
+        console.error(error);
+        return;
+      }
       console.log('QR Code generated!');
     });
 
