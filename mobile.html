@@ -1,17 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Mobile QR Scanner</title>
+  <title>Mobile Attendance</title>
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 </head>
 <body>
-  <h2>Marking Attendance...</h2>
-  <h3 id="result">Scanning...</h3>
+  <video id="preview" width="100%" height="auto" style="border: 1px solid black"></video>
 
   <script>
-    // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyBENDNpKZPR40mg4HhhhhiQyoz08Sq4yO8",
       authDomain: "qr-code-based-attendance-befb1.firebaseapp.com",
@@ -26,16 +25,37 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Set attendance to true and timestamp
-    
-   const now = new Date();
-db.ref("attendance/").set({
-  status: true,
-  timestamp: now.toLocaleString()
-});
+    const video = document.getElementById("preview");
+    const canvasElement = document.createElement("canvas");
+    const canvas = canvasElement.getContext("2d");
 
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }).then((stream) => {
+      video.srcObject = stream;
+      video.setAttribute("playsinline", true);
+      video.play();
+      requestAnimationFrame(scanQRCode);
+    });
 
-    document.getElementById("result").textContent = "✅ Attendance Marked!";
+    function scanQRCode() {
+      if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        canvasElement.width = video.videoWidth;
+        canvasElement.height = video.videoHeight;
+        canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+
+        const imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
+        const code = jsQR(imageData.data, canvasElement.width, canvasElement.height);
+
+        if (code) {
+          const now = new Date().toLocaleString();
+          db.ref("attendance").set({
+            status: true,
+            timestamp: now
+          });
+          alert("Attendance Marked!");
+        }
+      }
+      requestAnimationFrame(scanQRCode);
+    }
   </script>
 </body>
 </html>
