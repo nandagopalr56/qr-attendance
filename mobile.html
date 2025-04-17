@@ -1,69 +1,39 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Mobile Attendance</title>
+  <title>Mobile QR Scanner</title>
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-
-  <!-- QR Code Scanner Library -->
-  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 </head>
 <body>
-  <video id="preview" width="100%" height="auto" style="border: 1px solid black"></video>
+  <h2>Marking Attendance...</h2>
+  <h3 id="result">Scanning...</h3>
 
   <script>
-    // Firebase configuration
+    // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyBENDNpKZPR40mg4HhhhhiQyoz08Sq4yO8",
       authDomain: "qr-code-based-attendance-befb1.firebaseapp.com",
       databaseURL: "https://qr-code-based-attendance-befb1-default-rtdb.firebaseio.com",
       projectId: "qr-code-based-attendance-befb1",
-      storageBucket: "qr-code-based-attendance-befb1.firebasestorage.app",
+      storageBucket: "qr-code-based-attendance-befb1.appspot.com",
       messagingSenderId: "636789197305",
       appId: "1:636789197305:web:646fe72e8219ebd029d528",
       measurementId: "G-D7KGGZCQ4E"
     };
 
-    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Set up the QR scanner
-    const video = document.getElementById("preview");
-    const canvasElement = document.createElement("canvas");
-    const canvas = canvasElement.getContext("2d");
-
-    // Start the video stream
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }).then((stream) => {
-      video.srcObject = stream;
-      video.setAttribute("playsinline", true); // required to play video inline on iPhone
-      video.play();
-      requestAnimationFrame(scanQRCode);
+    // Set attendance to true and timestamp
+    const now = new Date();
+    db.ref("attendance/").set({
+      status: true,
+      timestamp: now.toLocaleString()
     });
 
-    function scanQRCode() {
-      if (video.readyState === video.HAVE_ENOUGH_DATA) {
-        // Set the canvas size to the video size
-        canvasElement.width = video.videoWidth;
-        canvasElement.height = video.videoHeight;
-        canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
-
-        // Try to decode the QR code
-        const imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
-        const code = jsQR(imageData.data, canvasElement.width, canvasElement.height);
-
-        if (code) {
-          // Successfully detected a QR code, mark attendance
-          db.ref("attendance/").set({
-            marked: true
-          });
-          alert("Attendance Marked!");  // Alert user that attendance is marked
-        }
-      }
-
-      requestAnimationFrame(scanQRCode);
-    }
+    document.getElementById("result").textContent = "✅ Attendance Marked!";
   </script>
 </body>
 </html>
