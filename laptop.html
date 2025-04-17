@@ -1,60 +1,60 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Laptop Attendance Screen</title>
-  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.4.4/build/qrcode.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dynamic QR Code - Laptop</title>
+  
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding-top: 40px;
-    }
-    img {
-      width: 200px;
-      margin-bottom: 20px;
-    }
-    #status {
-      font-size: 24px;
-      color: green;
-      margin-top: 20px;
-    }
-  </style>
+  
+  <!-- QR Code Library -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.4.4/build/qrcode.min.js"></script>
 </head>
 <body>
-  <h1>Scan the QR Code to Mark Attendance</h1>
-  <img src="qr.png" alt="QR Code" width=500 height=500>
-  <div id="status"></div>
+  <h2>Scan this QR code with the mobile to mark attendance</h2>
+  <div id="qr-code"></div>
+  <div id="attendance-status"></div>
 
   <script>
+    // Firebase Configuration
     const firebaseConfig = {
       apiKey: "AIzaSyBENDNpKZPR40mg4HhhhhiQyoz08Sq4yO8",
       authDomain: "qr-code-based-attendance-befb1.firebaseapp.com",
       databaseURL: "https://qr-code-based-attendance-befb1-default-rtdb.firebaseio.com",
       projectId: "qr-code-based-attendance-befb1",
-      storageBucket: "qr-code-based-attendance-befb1.appspot.com",
+      storageBucket: "qr-code-based-attendance-befb1.firebasestorage.app",
       messagingSenderId: "636789197305",
-      appId: "1:636789197305:web:646fe72e8219ebd029d528"
+      appId: "1:636789197305:web:646fe72e8219ebd029d528",
+      measurementId: "G-D7KGGZCQ4E"
     };
 
+    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    const statusDiv = document.getElementById('status');
+    // Generate dynamic QR Code
+    function generateDynamicQRCode() {
+      const uniqueCode = Math.random().toString(36).substr(2, 9); // Unique code for every scan
+      const qrCodeUrl = `https://your-app-url.com/attendance/${uniqueCode}`;
+      document.getElementById('qr-code').innerHTML = '';
+      QRCode.toCanvas(document.getElementById('qr-code'), qrCodeUrl, function (error) {
+        if (error) console.error(error);
+        console.log('QR Code generated!');
+      });
 
-    function listenForAttendance() {
-      db.ref("attendance").on("value", (snapshot) => {
+      // Set up the Firebase listener for attendance update
+      db.ref('attendance').on('value', snapshot => {
         const data = snapshot.val();
-        if (data && data.date && data.time) {
-          statusDiv.innerText = `Attendance Marked at ${data.time} on ${data.date}`;
-        } else {
-          statusDiv.innerText = "";
+        if (data && data.marked === true) {
+          document.getElementById('attendance-status').textContent = 'Attendance Marked at: ' + data.timestamp;
         }
       });
     }
 
-    listenForAttendance();
+    // Call the function to generate QR code on page load
+    window.onload = generateDynamicQRCode;
   </script>
 </body>
 </html>
