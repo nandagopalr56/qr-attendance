@@ -27,11 +27,13 @@
     const db = firebase.database();
 
     // Set attendance to true and timestamp
-    const now = new Date();
-    db.ref("attendance/").set({
-      status: true,
-      timestamp: now.toLocaleString()
-    });
+    
+   const now = new Date();
+db.ref("attendance/").set({
+  status: true,
+  timestamp: now.toLocaleString()
+});
+
 
     document.getElementById("result").textContent = "✅ Attendance Marked!";
   </script>
