@@ -1,56 +1,52 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Attendance Marked</title>
-    <!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/9.8.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.8.1/firebase-database.js"></script>
+  <title>Mobile Attendance</title>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
+  <!-- QR Code Scanner Library -->
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 </head>
 <body>
-    <h2>Attendance Marked</h2>
+  <video id="preview" width="100%" height="auto" style="border: 1px solid black"></video>
 
-    <script>
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyBENDNpKZPR40mg4HhhhhiQyoz08Sq4yO8",
-            authDomain: "qr-code-based-attendance-befb1.firebaseapp.com",
-            databaseURL: "https://qr-code-based-attendance-befb1-default-rtdb.firebaseio.com",
-            projectId: "qr-code-based-attendance-befb1",
-            storageBucket: "qr-code-based-attendance-befb1.firebasestorage.app",
-            messagingSenderId: "636789197305",
-            appId: "1:636789197305:web:646fe72e8219ebd029d528",
-            measurementId: "G-D7KGGZCQ4E"
-        };
+  <script>
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyBENDNpKZPR40mg4HhhhhiQyoz08Sq4yO8",
+      authDomain: "qr-code-based-attendance-befb1.firebaseapp.com",
+      databaseURL: "https://qr-code-based-attendance-befb1-default-rtdb.firebaseio.com",
+      projectId: "qr-code-based-attendance-befb1",
+      storageBucket: "qr-code-based-attendance-befb1.firebasestorage.app",
+      messagingSenderId: "636789197305",
+      appId: "1:636789197305:web:646fe72e8219ebd029d528",
+      measurementId: "G-D7KGGZCQ4E"
+    };
 
-        // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const database = firebase.database(app);
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-        // Function to mark attendance and push data to Firebase
-function markAttendance() {
-  const date = new Date();
-  const dateString = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
-  const timeString = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()} ${date.getHours() >= 12 ? 'PM' : 'AM'}`;
+    const video = document.getElementById("preview");
+    const canvasElement = document.createElement("canvas");
+    const canvas = canvasElement.getContext("2d");
 
-  // Push attendance data to Firebase
-  const attendanceRef = db.ref('attendance/' + new Date().getTime()); // Using timestamp as key
-  attendanceRef.set({
-    date: dateString,
-    time: timeString,
-    status: 'Marked'
-  }).then(() => {
-    alert("Attendance Marked!");
-  }).catch((error) => {
-    console.error("Error marking attendance: ", error);
-  });
-}
+    let attendanceMarked = false;
 
+    // Start the video stream
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }).then((stream) => {
+      video.srcObject = stream;
+      video.setAttribute("playsinline", true); 
+      video.play();
+      requestAnimationFrame(scanQRCode);
+    });
 
-        // Call markAttendance function (you can trigger it on any event like button click)
-        markAttendance();
-    </script>
-</body>
-</html>
+    function scanQRCode() {
+      if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        canvasElement.width = video.videoWidth;
+        canvasElement.height = video.videoHeight;
+        canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+
+        const
