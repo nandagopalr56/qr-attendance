@@ -5,10 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Laptop Attendance</title>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-
   <!-- QR Code Library -->
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.4.4/build/qrcode.min.js"></script>
 
@@ -31,22 +27,6 @@
   <h4 id="status">Waiting for scan...</h4>
 
   <script>
-    // Firebase Configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyBENDNpKZPR40mg4HhhhhiQyoz08Sq4yO8",
-      authDomain: "qr-code-based-attendance-befb1.firebaseapp.com",
-      databaseURL: "https://qr-code-based-attendance-befb1-default-rtdb.firebaseio.com",
-      projectId: "qr-code-based-attendance-befb1",
-      storageBucket: "qr-code-based-attendance-befb1.firebasestorage.app",
-      messagingSenderId: "636789197305",
-      appId: "1:636789197305:web:646fe72e8219ebd029d528",
-      measurementId: "G-D7KGGZCQ4E"
-    };
-
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
     // Generate Dynamic QR Code (Every time the page is refreshed)
     const uniqueCode = new Date().getTime();  // Use the current timestamp as unique code
     const qrCodeElement = document.getElementById('qr-code');
@@ -58,14 +38,6 @@
         return;
       }
       console.log('QR Code generated!');
-    });
-
-    // Listen for changes in Firebase and update status
-    db.ref('attendance').on('value', snapshot => {
-      const attendanceData = snapshot.val();
-      if (attendanceData && attendanceData.marked) {
-        document.getElementById('status').innerText = 'Attendance Marked!';
-      }
     });
   </script>
 </body>
