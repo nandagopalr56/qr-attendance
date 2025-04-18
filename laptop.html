@@ -1,30 +1,71 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Laptop Attendance Screen</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+  <!-- Styles -->
   <style>
     body {
-      font-family: Arial, sans-serif;
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f4f6f8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    h1 {
+      color: #333;
+      font-size: 32px;
+      margin-bottom: 30px;
       text-align: center;
-      padding-top: 40px;
     }
-    img {
-      width: 200px;
-      margin-bottom: 20px;
+
+    #qr-image {
+      width: 90vw;
+      max-width: 400px;
+      height: auto;
+      object-fit: contain;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      border-radius: 16px;
     }
+
     #status {
-      font-size: 24px;
-      color: green;
-      margin-top: 20px;
+      font-size: 22px;
+      color: #0a891e;
+      margin-top: 30px;
+      padding: 15px 25px;
+      background-color: #e6f8ec;
+      border: 1px solid #b6e7c4;
+      border-radius: 12px;
+      max-width: 90%;
+      display: none;
+      animation: fadeIn 0.6s ease-in-out forwards;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
   </style>
 </head>
 <body>
-  <h1>Scan the QR Code to Mark Attendance</h1>
-<img src="qr.png" alt="QR Code" id="qr-image" style="width: 600px; height: 600px; object-fit: contain; display: block; margin: 0 auto;">
 
+  <h1>Scan the QR Code to Mark Attendance</h1>
+  <img src="qr.png" alt="QR Code" id="qr-image">
   <div id="status"></div>
 
   <script>
@@ -47,9 +88,11 @@
       db.ref("attendance").on("value", (snapshot) => {
         const data = snapshot.val();
         if (data && data.date && data.time) {
-          statusDiv.innerText = `Attendance Marked at ${data.time} on ${data.date}`;
+          statusDiv.innerText = `✅ Attendance Marked at ${data.time} on ${data.date}`;
+          statusDiv.style.display = 'block';
         } else {
           statusDiv.innerText = "";
+          statusDiv.style.display = 'none';
         }
       });
     }
