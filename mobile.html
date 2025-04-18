@@ -1,24 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mobile QR Scanner</title>
-  
+  <title>Mobile Attendance</title>
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  
+
   <!-- QR Code Scanner Library -->
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 </head>
 <body>
-  <h2>Scan the QR code</h2>
   <video id="preview" width="100%" height="auto" style="border: 1px solid black"></video>
-  <div id="scanner-status"></div>
 
   <script>
-    // Firebase Configuration
+    // Firebase configuration
     const firebaseConfig = {
       apiKey: "AIzaSyBENDNpKZPR40mg4HhhhhiQyoz08Sq4yO8",
       authDomain: "qr-code-based-attendance-befb1.firebaseapp.com",
@@ -59,21 +54,22 @@
         const code = jsQR(imageData.data, canvasElement.width, canvasElement.height);
 
         if (code) {
-          const scannedData = code.data;
-          // Check if the scanned QR code is valid
-          const qrCodeUrl = "https://your-app-url.com/attendance/";
-          if (scannedData.includes(qrCodeUrl)) {
-            // Mark attendance and update Firebase
-            db.ref("attendance").set({
-              marked: true,
-              timestamp: new Date().toISOString()
-            });
+          // Successfully detected a QR code, mark attendance with date & time
+          const currentDate = new Date();
+          const date = currentDate.toLocaleDateString();
+          const time = currentDate.toLocaleTimeString();
+          
+          // Store the data in Firebase
+          db.ref("attendance/latest").set({
+            date: date,
+            time: time,
+            status: true
+          });
 
-            document.getElementById('scanner-status').textContent = 'Attendance Marked!';
-            alert("Attendance marked successfully!");
-          }
+          alert("Attendance Marked!");
         }
       }
+
       requestAnimationFrame(scanQRCode);
     }
   </script>
