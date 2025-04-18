@@ -38,28 +38,40 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Check if already marked during this session
-    if (!sessionStorage.getItem("attendanceMarked")) {
-      const now = new Date();
-      const time = now.toLocaleTimeString();
-      const date = now.toLocaleDateString();
+    // Reference to the attendance node
+    const attendanceRef = db.ref("attendance");
 
-      db.ref("attendance").set({
-        time: time,
-        date: date
-      }).then(() => {
-        sessionStorage.setItem("attendanceMarked", "true");
-        document.querySelector("h2").textContent = "✅ Attendance Marked Successfully!";
+    // Check if attendance already marked
+    attendanceRef.once("value", (snapshot) => {
+      const data = snapshot.val();
+      if (data && data.date && data.time) {
+        // Attendance already marked, show confirmation
+        document.querySelector("h2").textContent = "✅ Attendance already marked!";
+        // Prevent further action, show message, and redirect
         setTimeout(() => {
           window.location.href = "https://nandagopalr56.github.io/qr-attendance/thankyou.html";
         }, 2000);
-      }).catch((error) => {
-        document.querySelector("h2").textContent = "❌ Failed to mark attendance. Try again.";
-        console.error("Error:", error);
-      });
-    } else {
-      document.querySelector("h2").textContent = "✅ Attendance already marked!";
-    }
+      } else {
+        // Mark attendance if not already marked
+        const now = new Date();
+        const time = now.toLocaleTimeString();
+        const date = now.toLocaleDateString();
+
+        attendanceRef.set({
+          time: time,
+          date: date
+        }).then(() => {
+          document.querySelector("h2").textContent = "✅ Attendance Marked Successfully!";
+          setTimeout(() => {
+            window.location.href = "https://nandagopalr56.github.io/qr-attendance/thankyou.html";
+          }, 2000);
+        }).catch((error) => {
+          document.querySelector("h2").textContent = "❌ Failed to mark attendance. Try again.";
+          console.error("Error:", error);
+        });
+      }
+    });
+
   </script>
 
 </body>
