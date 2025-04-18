@@ -18,25 +18,11 @@
       font-size: 24px;
       margin-bottom: 20px;
     }
-    #scan-btn {
-      padding: 10px 20px;
-      font-size: 18px;
-      color: white;
-      background-color: #4CAF50;
-      border: none;
-      cursor: pointer;
-    }
-    #scan-btn:disabled {
-      background-color: #888;
-      cursor: not-allowed;
-    }
   </style>
 </head>
 <body>
 
-  <h2>Scan the QR Code to Mark Attendance</h2>
-  <button id="scan-btn">Scan QR Code</button>
-  <h2 id="status"></h2>
+  <h2>Marking your attendance...</h2>
 
   <script>
     const firebaseConfig = {
@@ -52,51 +38,37 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    const scanButton = document.getElementById('scan-btn');
-    const statusDiv = document.getElementById('status');
+    // Reference to the attendance node
+    const attendanceRef = db.ref("attendance");
 
-    // Function to check if attendance has already been marked
-    function checkAttendance() {
-      db.ref("attendance").once("value", (snapshot) => {
-        const data = snapshot.val();
-        if (data && data.date && data.time) {
-          // Attendance already marked, show confirmation and disable scan
-          statusDiv.textContent = "✅ Attendance already marked!";
-          scanButton.disabled = true; // Disable the scan button
-          setTimeout(() => {
-            window.location.href = "https://nandagopalr56.github.io/qr-attendance/thankyou.html";
-          }, 2000);
-        } else {
-          // Allow scanning
-          scanButton.disabled = false;
-        }
-      });
-    }
-
-    // Call checkAttendance function when the page loads
-    checkAttendance();
-
-    // Simulate QR scan (replace with actual scanning logic)
-    scanButton.addEventListener('click', () => {
-      // Simulate successful attendance marking
-      const now = new Date();
-      const time = now.toLocaleTimeString();
-      const date = now.toLocaleDateString();
-
-      // Mark attendance in Firebase
-      db.ref("attendance").set({
-        time: time,
-        date: date
-      }).then(() => {
-        statusDiv.textContent = "✅ Attendance Marked Successfully!";
-        scanButton.disabled = true; // Disable scan button after marking
+    // Check if attendance already marked
+    attendanceRef.once("value", (snapshot) => {
+      const data = snapshot.val();
+      if (data && data.date && data.time) {
+        // Attendance already marked, show confirmation
+        document.querySelector("h2").textContent = "✅ Attendance already marked!";
         setTimeout(() => {
-          window.location.href = "https://nandagopalr56.github.io/qr-attendance/thankyou.html";
+          window.location.href = "https://nandagopalr56.github.io/qr-attendance/thankyou.html"; // Correct the URL here
         }, 2000);
-      }).catch((error) => {
-        statusDiv.textContent = "❌ Failed to mark attendance. Try again.";
-        console.error("Error:", error);
-      });
+      } else {
+        // Mark attendance if not already marked
+        const now = new Date();
+        const time = now.toLocaleTimeString();
+        const date = now.toLocaleDateString();
+
+        attendanceRef.set({
+          time: time,
+          date: date
+        }).then(() => {
+          document.querySelector("h2").textContent = "✅ Attendance Marked Successfully!";
+          setTimeout(() => {
+            window.location.href = "https://nandagopalr56.github.io/qr-attendance/thankyou.html"; // Correct the URL here
+          }, 2000);
+        }).catch((error) => {
+          document.querySelector("h2").textContent = "❌ Failed to mark attendance. Try again.";
+          console.error("Error:", error);
+        });
+      }
     });
   </script>
 
