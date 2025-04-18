@@ -1,72 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>University Attendance Screen</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Firebase -->
+  <title>Laptop Attendance Screen</title>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-
-  <!-- Styles -->
   <style>
     body {
-      margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f0f8ff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 40px 20px;
-      min-height: 100vh;
-    }
-
-    h1 {
-      color: #003366;
-      font-size: 28px;
-      margin-bottom: 30px;
+      font-family: Arial, sans-serif;
       text-align: center;
+      padding-top: 40px;
     }
-
-    #qr-image {
-      width: 90vw;
-      max-width: 300px;
-      height: 300px;
-      object-fit: contain;
-      background-color: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    img {
+      width: 200px;
+      margin-bottom: 20px;
     }
-
     #status {
-      font-size: 20px;
-      color: #004d00;
-      background-color: #d4f5d4;
-      border: 1px solid #99e099;
-      border-radius: 10px;
-      padding: 15px 25px;
-      margin-top: 30px;
-      display: none;
-      animation: fadeIn 0.5s ease-in-out forwards;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(15px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      font-size: 24px;
+      color: green;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
+  <h1>Scan the QR Code to Mark Attendance</h1>
+<img src="qr.png" alt="QR Code" id="qr-image" style="width: 600px; height: 600px; object-fit: contain; display: block; margin: 0 auto;">
 
-  <h1>Scan the QR Code to Mark Your Attendance</h1>
-  <img src="qr.png" alt="QR Code" id="qr-image">
   <div id="status"></div>
 
   <script>
@@ -82,17 +40,16 @@
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
+
     const statusDiv = document.getElementById('status');
 
     function listenForAttendance() {
       db.ref("attendance").on("value", (snapshot) => {
         const data = snapshot.val();
         if (data && data.date && data.time) {
-          statusDiv.innerText = `✅ Attendance Marked at ${data.time} on ${data.date}`;
-          statusDiv.style.display = 'block';
+          statusDiv.innerText = `Attendance Marked at ${data.time} on ${data.date}`;
         } else {
           statusDiv.innerText = "";
-          statusDiv.style.display = 'none';
         }
       });
     }
