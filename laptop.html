@@ -43,16 +43,19 @@
 
     const statusDiv = document.getElementById('status');
 
-    function listenForAttendance() {
-      db.ref("attendance").on("value", (snapshot) => {
-        const data = snapshot.val();
-        if (data && data.date && data.time) {
-          statusDiv.innerText = `Attendance Marked at ${data.time} on ${data.date}`;
-        } else {
-          statusDiv.innerText = "";
-        }
-      });
+   function listenForAttendance() {
+  db.ref("attendance").on("value", (snapshot) => {
+    const data = snapshot.val();
+    console.log("Firebase data received:", data);
+
+    if (data && data.date && data.time) {
+      statusDiv.innerText = `Attendance Marked at ${data.time} on ${data.date}`;
+    } else {
+      statusDiv.innerText = "";
     }
+  });
+}
+
 
     listenForAttendance();
   </script>
