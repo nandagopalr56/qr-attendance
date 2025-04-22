@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<meta charset="utf-8"/>
+<html lang="en">
+<html>
+<head>
+    <title>Form</title>
+</head>
+<body>
+
+<h2>Enter your details</h2>
+
+<form>
+  <label for="username">Username:</label>
+  <input type="text" id="username" name="username"><br><br>
+  
+  <label for="password">Password:</label>
+  <input type="password" id="password" name="password"><br><br>
+  
+  <button type="button" onclick="Login()">Login</button>
+</form> 
+
+<script>
+function Login() {
+    let username = document.getElementById("username").value;
+    let password = document.getElementById("password").value;
+    if (username === "admin" && password === "1234") {
+      window.location.href="mobile.html";
+
+    } else {
+        alert("Incorrect Username or Password!");
+    }
+}
+</script>
+
+</body>
+</html>
