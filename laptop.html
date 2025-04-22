@@ -11,8 +11,14 @@
       padding-top: 40px;
     }
     img {
-      width: 200px;
+      width: 600px;
+      height: 600px;
+      object-fit: contain;
       margin-bottom: 20px;
+    }
+    #status {
+      font-size: 22px;
+      margin-top: 10px;
     }
     button a {
       text-decoration: none;
@@ -23,24 +29,21 @@
       border: none;
       color: white;
       padding: 20px 50px;
-      text-align: center;
       font-size: 20px;
-      margin-top: 20px;
-      cursor: pointer;
       border-radius: 8px;
-      width: 300px; /* Adjust the width of the button */
-    }
-    button:hover {
-      background-color: #45a049;
+      width: 300px;
+      cursor: pointer;
+      margin-top: 30px;
     }
   </style>
 </head>
 <body>
   <h1>Scan the QR Code to Mark Attendance</h1>
-  <img src="qr.png" alt="QR Code" id="qr-image" style="width: 600px; height: 600px; object-fit: contain; display: block; margin: 0 auto;">
-  
-  <!-- Larger Attendance Log Button with Link -->
-  <button><a href="https://console.firebase.google.com/u/1/project/qr-code-based-attendance-befb1/database/qr-code-based-attendance-befb1-default-rtdb/data/~2Fattendance~2Flatest" target="_blank">Attendance Log</a></button>
+  <img src="qr.png" alt="QR Code" id="qr-image">
+  <div id="status">Waiting for scan...</div>
+  <button>
+    <a href="https://console.firebase.google.com/u/1/project/qr-code-based-attendance-befb1/database/qr-code-based-attendance-befb1-default-rtdb/data/~2Fattendance~2Flatest" target="_blank">Attendance Log</a>
+  </button>
 
   <script>
     const firebaseConfig = {
@@ -56,10 +59,11 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Status div has been removed, keeping the listener in place for logging to Google Sheets
-    db.ref("attendance").on("value", (snapshot) => {
+    db.ref("attendance/latest").on("value", (snapshot) => {
       const data = snapshot.val();
-      console.log("Attendance updated in Firebase:", data); // Still logs for reference
+      if (data) {
+        document.getElementById("status").innerText = `Attendance Marked ✅\nDate: ${data.date}, Time: ${data.time}`;
+      }
     });
   </script>
 </body>
