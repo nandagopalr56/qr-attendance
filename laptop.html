@@ -1,51 +1,35 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
   <title>Laptop Attendance Screen</title>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding-top: 40px;
+    body { font-family: Arial, sans-serif; text-align: center; padding: 40px; }
+    img { width: 600px; height: 600px; object-fit: contain; margin-bottom: 20px; }
+    #status { font-size: 24px; margin-top: 20px; }
+    button { 
+      background: #4CAF50; color: white; border: none; 
+      padding: 20px 50px; font-size: 20px; border-radius: 8px; 
+      cursor: pointer; margin-top: 20px; width: 300px; 
     }
-    img {
-      width: 600px;
-      height: 600px;
-      object-fit: contain;
-      margin-bottom: 20px;
-    }
-    #status {
-      font-size: 22px;
-      margin-top: 10px;
-    }
-    button a {
-      text-decoration: none;
-      color: white;
-    }
-    button {
-      background-color: #4CAF50;
-      border: none;
-      color: white;
-      padding: 20px 50px;
-      font-size: 20px;
-      border-radius: 8px;
-      width: 300px;
-      cursor: pointer;
-      margin-top: 30px;
-    }
+    button a { color: white; text-decoration: none; }
+    button:hover { background: #45a049; }
   </style>
 </head>
 <body>
   <h1>Scan the QR Code to Mark Attendance</h1>
-  <img src="qr.png" alt="QR Code" id="qr-image">
+  <img src="qr.png" alt="QR Code">
   <div id="status">Waiting for scan...</div>
   <button>
-    <a href="https://console.firebase.google.com/u/1/project/qr-code-based-attendance-befb1/database/qr-code-based-attendance-befb1-default-rtdb/data/~2Fattendance~2Flatest" target="_blank">Attendance Log</a>
+    <a href="https://console.firebase.google.com/u/1/project/qr-code-based-attendance-befb1/database/qr-code-based-attendance-befb1-default-rtdb/data/~2Fattendance~2Flatest" target="_blank">
+      Attendance Log
+    </a>
   </button>
 
   <script>
+    // Firebase config (same as mobile)
     const firebaseConfig = {
       apiKey: "AIzaSyBENDNpKZPR40mg4HhhhhiQyoz08Sq4yO8",
       authDomain: "qr-code-based-attendance-befb1.firebaseapp.com",
@@ -55,14 +39,15 @@
       messagingSenderId: "636789197305",
       appId: "1:636789197305:web:646fe72e8219ebd029d528"
     };
-
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    db.ref("attendance/latest").on("value", (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        document.getElementById("status").innerText = `Attendance Marked ✅\nDate: ${data.date}, Time: ${data.time}`;
+    // Listen for attendance updates
+    db.ref("attendance/latest").on("value", snap => {
+      const d = snap.val();
+      if (d && d.status === "Marked") {
+        document.getElementById("status").innerText =
+          `✅ Attendance Marked at ${d.time} on ${d.date}`;
       }
     });
   </script>
