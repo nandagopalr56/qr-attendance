@@ -1,36 +1,80 @@
 <!DOCTYPE html>
-<meta charset="utf-8"/>
 <html lang="en">
-<html>
 <head>
-    <title>Form</title>
+  <meta charset="UTF-8" />
+  <title>Student Login</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f6f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .login-container {
+      background-color: white;
+      padding: 30px 40px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #007bff;
+      border: none;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+    }
+  </style>
 </head>
 <body>
+  <div class="login-container">
+    <h2>Enter your details</h2>
 
-<h2>Enter your details</h2>
+    <form autocomplete="off">
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="username" required />
 
-<form>
-  <label for="username">Username:</label>
-  <input type="text" id="username" name="username"><br><br>
-  
-  <label for="password">Password:</label>
-  <input type="password" id="password" name="password"><br><br>
-  
-  <button type="button" onclick="Login()">Login</button>
-</form> 
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required />
 
-<script>
-function Login() {
-    let username = document.getElementById("username").value;
-    let password = document.getElementById("password").value;
-    if (username === "admin" && password === "1234") {
-      window.location.href="mobile.html";
+      <button type="button" onclick="Login()">Login</button>
+    </form>
+  </div>
 
-    } else {
+  <script>
+    function Login() {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      if (username === "admin" && password === "1234") {
+        window.location.href = "mobile.html";
+      } else {
         alert("Incorrect Username or Password!");
+      }
     }
-}
-</script>
-
+  </script>
 </body>
 </html>
