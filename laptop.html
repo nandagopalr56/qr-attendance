@@ -9,16 +9,34 @@
       font-family: Arial, sans-serif;
       text-align: center;
       padding-top: 40px;
+      background-color: #f9fafb;
     }
+
     img {
-      width: 200px;
-      margin-bottom: 20px;
+      width: 600px;
+      height: 600px;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto 20px;
+    }
+
+    #status-message {
+      font-size: 20px;
+      color: #065f46;
+      background-color: #d1fae5;
+      border: 1px solid #34d399;
+      display: inline-block;
+      padding: 12px 20px;
+      border-radius: 10px;
+      margin-top: 20px;
+      display: none; /* Hidden until status is marked */
     }
   </style>
 </head>
 <body>
   <h1>Scan the QR Code to Mark Attendance</h1>
-  <img src="qr.png" alt="QR Code" id="qr-image" style="width: 600px; height: 600px; object-fit: contain; display: block; margin: 0 auto;">
+  <img src="qr.png" alt="QR Code" id="qr-image">
+  <div id="status-message"></div>
 
   <script>
     const firebaseConfig = {
@@ -34,10 +52,18 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Status div has been removed, keeping the listener in place for logging to Google Sheets
+    const statusDiv = document.getElementById('status-message');
+
     db.ref("attendance").on("value", (snapshot) => {
       const data = snapshot.val();
-      console.log("Attendance updated in Firebase:", data); // Still logs for reference
+      if (data && data.status === true) {
+        const time = data.time || "Unknown time";
+        const date = data.date || "Unknown date";
+        statusDiv.innerText = `✅ Attendance Marked at ${time} on ${date}`;
+        statusDiv.style.display = "inline-block";
+      } else {
+        statusDiv.style.display = "none"; // Hide if reset or false
+      }
     });
   </script>
 </body>
