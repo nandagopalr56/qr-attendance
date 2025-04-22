@@ -2,32 +2,38 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>QR Scanner - Attendance</title>
-  <script src="https://unpkg.com/html5-qrcode@2.3.7/minified/html5-qrcode.min.js"></script>
+  <title>QR Attendance Scanner</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- QR Code Scanner Library -->
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script>
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      padding: 20px;
-    }
-    #reader {
-      width: 300px;
-      margin: 0 auto;
+      margin: 0;
+      padding: 0;
     }
     h1 {
-      margin-bottom: 20px;
+      padding: 20px 10px;
+      font-size: 24px;
+    }
+    #reader {
+      width: 90%;
+      max-width: 400px;
+      margin: 0 auto;
     }
   </style>
 </head>
 <body>
 
-  <h1>QR Code Attendance Scanner</h1>
+  <h1>Scan QR to Mark Attendance</h1>
   <div id="reader"></div>
 
   <script>
-    // Firebase configuration
+    // Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyBENDNpKZPR40mg4HhhhhiQyoz08Sq4yO8",
       authDomain: "qr-code-based-attendance-befb1.firebaseapp.com",
@@ -40,13 +46,12 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    const html5QrCode = new Html5Qrcode("reader");
-
     function startScanner() {
-      html5QrCode.start(
-        { facingMode: "environment" }, 
-        { fps: 10, qrbox: 250 },
-        (decodedText) => {
+      const html5QrCode = new Html5Qrcode("reader");
+      const config = { fps: 10, qrbox: 250 };
+
+      html5QrCode.start({ facingMode: "environment" }, config,
+        (decodedText, decodedResult) => {
           html5QrCode.stop().then(() => {
             const now = new Date();
             const data = {
@@ -55,19 +60,21 @@
               time: now.toLocaleTimeString()
             };
             db.ref("attendance/latest").set(data)
-              .then(() => alert("Attendance Marked at " + data.time))
-              .catch(err => console.error("Firebase Error:", err));
-          });
+              .then(() => alert("Attendance Marked Successfully!"))
+              .catch(error => alert("Error writing to Firebase"));
+          }).catch(err => console.error("Stop error:", err));
         },
         (errorMessage) => {
-          // Optional: console.log("Scan error:", errorMessage);
+          // Silent scan errors
         }
       ).catch(err => {
-        console.error("Camera start error:", err);
+        alert("Camera access error: " + err);
       });
     }
 
-    startScanner();
+    // Start the QR scanner on load
+    window.onload = startScanner;
   </script>
+
 </body>
 </html>
