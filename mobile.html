@@ -59,14 +59,21 @@
           const date = currentDate.toLocaleDateString();  // Format: MM/DD/YYYY
           const time = currentDate.toLocaleTimeString();  // Format: HH:MM:SS AM/PM
           
-          // Store the data in Firebase under "attendance/latest"
-          db.ref("attendance/latest").set({
-            date: date,
-            time: time,
-            status: true
-          });
+          // Check if attendance for this date already exists
+          db.ref("attendance").orderByChild("date").equalTo(date).once("value", (snapshot) => {
+            if (!snapshot.exists()) {
+              // If no record exists for this date, mark attendance
+              db.ref("attendance/latest").set({
+                date: date,
+                time: time,
+                status: true
+              });
 
-          alert("Attendance Marked!");
+              alert("Attendance Marked!");
+            } else {
+              alert("Attendance already marked for today.");
+            }
+          });
         }
       }
 
