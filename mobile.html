@@ -7,17 +7,27 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
-    #reader { width: 300px; margin: auto; }
-    h1 { margin-bottom: 20px; }
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    #reader {
+      width: 300px;
+      margin: 0 auto;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
   </style>
 </head>
 <body>
+
   <h1>QR Code Attendance Scanner</h1>
   <div id="reader"></div>
 
   <script>
-    // Firebase config
+    // Firebase configuration
     const firebaseConfig = {
       apiKey: "AIzaSyBENDNpKZPR40mg4HhhhhiQyoz08Sq4yO8",
       authDomain: "qr-code-based-attendance-befb1.firebaseapp.com",
@@ -30,26 +40,34 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Start QR scanner
-    const scanner = new Html5Qrcode("reader");
-    scanner.start(
-      { facingMode: "environment" },
-      { fps: 10, qrbox: 250 },
-      decodedText => {
-        scanner.stop().then(() => {
-          const now = new Date();
-          const record = {
-            status: "Marked",
-            date: now.toLocaleDateString(),
-            time: now.toLocaleTimeString()
-          };
-          db.ref("attendance/latest").set(record)
-            .then(() => alert(`Attendance marked at ${record.time}`))
-            .catch(err => console.error(err));
-        });
-      },
-      errorMsg => { /* ignore scan errors */ }
-    ).catch(err => console.error("Scanner start failed:", err));
+    const html5QrCode = new Html5Qrcode("reader");
+
+    function startScanner() {
+      html5QrCode.start(
+        { facingMode: "environment" }, 
+        { fps: 10, qrbox: 250 },
+        (decodedText) => {
+          html5QrCode.stop().then(() => {
+            const now = new Date();
+            const data = {
+              status: "Marked",
+              date: now.toLocaleDateString(),
+              time: now.toLocaleTimeString()
+            };
+            db.ref("attendance/latest").set(data)
+              .then(() => alert("Attendance Marked at " + data.time))
+              .catch(err => console.error("Firebase Error:", err));
+          });
+        },
+        (errorMessage) => {
+          // Optional: console.log("Scan error:", errorMessage);
+        }
+      ).catch(err => {
+        console.error("Camera start error:", err);
+      });
+    }
+
+    startScanner();
   </script>
 </body>
 </html>
