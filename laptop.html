@@ -9,34 +9,24 @@
       font-family: Arial, sans-serif;
       text-align: center;
       padding-top: 40px;
-      background-color: #f9fafb;
     }
-
     img {
-      width: 600px;
-      height: 600px;
-      object-fit: contain;
-      display: block;
-      margin: 0 auto 20px;
+      width: 200px;
+      margin-bottom: 20px;
     }
-
-    #status-message {
-      font-size: 20px;
-      color: #065f46;
-      background-color: #d1fae5;
-      border: 1px solid #34d399;
-      display: inline-block;
-      padding: 12px 20px;
-      border-radius: 10px;
+    .attendance-status {
+      font-size: 1.5em;
+      color: green;
       margin-top: 20px;
-      display: none; /* Hidden until status is marked */
     }
   </style>
 </head>
 <body>
   <h1>Scan the QR Code to Mark Attendance</h1>
-  <img src="qr.png" alt="QR Code" id="qr-image">
-  <div id="status-message"></div>
+  <img src="qr.png" alt="QR Code" id="qr-image" style="width: 600px; height: 600px; object-fit: contain; display: block; margin: 0 auto;">
+  
+  <!-- Section to display attendance marked date and time -->
+  <div id="attendance-status" class="attendance-status"></div>
 
   <script>
     const firebaseConfig = {
@@ -49,20 +39,17 @@
       appId: "1:636789197305:web:646fe72e8219ebd029d528"
     };
 
+    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    const statusDiv = document.getElementById('status-message');
-
-    db.ref("attendance").on("value", (snapshot) => {
+    // Listen for attendance changes in Firebase
+    db.ref("attendance/latest").on("value", (snapshot) => {
       const data = snapshot.val();
+
       if (data && data.status === true) {
-        const time = data.time || "Unknown time";
-        const date = data.date || "Unknown date";
-        statusDiv.innerText = `✅ Attendance Marked at ${time} on ${date}`;
-        statusDiv.style.display = "inline-block";
-      } else {
-        statusDiv.style.display = "none"; // Hide if reset or false
+        // Display attendance status
+        document.getElementById("attendance-status").innerHTML = `Attendance Marked on ${data.date} at ${data.time}`;
       }
     });
   </script>
