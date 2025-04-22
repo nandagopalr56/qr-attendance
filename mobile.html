@@ -2,35 +2,22 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>QR Code Scanner - Attendance</title>
+  <title>QR Scanner - Attendance</title>
+  <script src="https://unpkg.com/html5-qrcode@2.3.7/minified/html5-qrcode.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  <script src="https://unpkg.com/html5-qrcode"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 20px;
-    }
-    #reader {
-      width: 300px;
-      margin: 0 auto;
-    }
-    #status {
-      font-size: 24px;
-      margin-top: 20px;
-      color: green;
-      font-weight: bold;
-    }
+    body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+    #reader { width: 300px; margin: auto; }
+    h1 { margin-bottom: 20px; }
   </style>
 </head>
 <body>
   <h1>QR Code Attendance Scanner</h1>
   <div id="reader"></div>
-  <div id="status"></div>
 
   <script>
-    // Firebase configuration
+    // Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyBENDNpKZPR40mg4HhhhhiQyoz08Sq4yO8",
       authDomain: "qr-code-based-attendance-befb1.firebaseapp.com",
@@ -40,45 +27,29 @@
       messagingSenderId: "636789197305",
       appId: "1:636789197305:web:646fe72e8219ebd029d528"
     };
-
-    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Start scanner
-    const html5QrCode = new Html5Qrcode("reader");
-    const qrConfig = { fps: 10, qrbox: 250 };
-
-    function markAttendance() {
-      const now = new Date();
-      const status = {
-        status: true,
-        date: now.toLocaleDateString(),
-        time: now.toLocaleTimeString()
-      };
-      db.ref("attendance/latest").set(status)
-        .then(() => {
-          document.getElementById("status").innerText = "✅ Attendance Marked!";
-        })
-        .catch(error => {
-          console.error("Error updating attendance:", error);
-        });
-    }
-
-    html5QrCode.start(
+    // Start QR scanner
+    const scanner = new Html5Qrcode("reader");
+    scanner.start(
       { facingMode: "environment" },
-      qrConfig,
-      (decodedText, decodedResult) => {
-        console.log(`Scanned: ${decodedText}`);
-        html5QrCode.stop(); // Prevent multiple scans
-        markAttendance();
+      { fps: 10, qrbox: 250 },
+      decodedText => {
+        scanner.stop().then(() => {
+          const now = new Date();
+          const record = {
+            status: "Marked",
+            date: now.toLocaleDateString(),
+            time: now.toLocaleTimeString()
+          };
+          db.ref("attendance/latest").set(record)
+            .then(() => alert(`Attendance marked at ${record.time}`))
+            .catch(err => console.error(err));
+        });
       },
-      (errorMessage) => {
-        // ignore errors during scanning
-      }
-    ).catch(err => {
-      console.error("Error starting QR scanner:", err);
-    });
+      errorMsg => { /* ignore scan errors */ }
+    ).catch(err => console.error("Scanner start failed:", err));
   </script>
 </body>
 </html>
