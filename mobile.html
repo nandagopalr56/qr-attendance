@@ -58,20 +58,22 @@
           const currentDate = new Date();
           const date = currentDate.toLocaleDateString();  // Format: MM/DD/YYYY
           const time = currentDate.toLocaleTimeString();  // Format: HH:MM:SS AM/PM
-          
-          // Check if attendance for this date already exists
-          db.ref("attendance").orderByChild("date").equalTo(date).once("value", (snapshot) => {
+          const timestamp = currentDate.getTime(); // Get timestamp for uniqueness
+
+          // Check if this exact timestamp already exists
+          db.ref("attendance").orderByChild("timestamp").equalTo(timestamp).once("value", (snapshot) => {
             if (!snapshot.exists()) {
-              // If no record exists for this date, mark attendance
+              // If the timestamp doesn't exist, mark attendance with the timestamp
               db.ref("attendance/latest").set({
                 date: date,
                 time: time,
-                status: true
+                status: true,
+                timestamp: timestamp  // Add timestamp to ensure uniqueness
               });
 
               alert("Attendance Marked!");
             } else {
-              alert("Attendance already marked for today.");
+              alert("Attendance has already been marked at this time.");
             }
           });
         }
