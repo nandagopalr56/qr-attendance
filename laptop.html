@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -14,19 +15,11 @@
       width: 200px;
       margin-bottom: 20px;
     }
-    .attendance-status {
-      font-size: 1.5em;
-      color: green;
-      margin-top: 20px;
-    }
   </style>
 </head>
 <body>
   <h1>Scan the QR Code to Mark Attendance</h1>
   <img src="qr.png" alt="QR Code" id="qr-image" style="width: 600px; height: 600px; object-fit: contain; display: block; margin: 0 auto;">
-  
-  <!-- Section to display attendance marked date and time -->
-  <div id="attendance-status" class="attendance-status"></div>
 
   <script>
     const firebaseConfig = {
@@ -39,18 +32,13 @@
       appId: "1:636789197305:web:646fe72e8219ebd029d528"
     };
 
-    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Listen for attendance changes in Firebase
-    db.ref("attendance/latest").on("value", (snapshot) => {
+    // Status div has been removed, keeping the listener in place for logging to Google Sheets
+    db.ref("attendance").on("value", (snapshot) => {
       const data = snapshot.val();
-
-      if (data && data.status === true) {
-        // Display attendance status
-        document.getElementById("attendance-status").innerHTML = `Attendance Marked on ${data.date} at ${data.time}`;
-      }
+      console.log("Attendance updated in Firebase:", data); // Still logs for reference
     });
   </script>
 </body>
