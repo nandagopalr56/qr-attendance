@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>QR Attendance Scanner</title>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR Attendance Scanner</title>
   <script src="https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script>
   <style>
     body {
@@ -33,36 +34,53 @@
     // Initialize the HTML5 QR Code Scanner
     const qrCodeScanner = new Html5Qrcode("reader");
 
-    // Check for available cameras
-    Html5Qrcode.getCameras().then(cameras => {
-      if (cameras && cameras.length > 0) {
-        // Start the scanner with the first available camera
-        qrCodeScanner.start(
-          { facingMode: "environment" }, // Use the rear camera
-          { fps: 10, qrbox: 250 }, // Frame rate and size of the scanning box
-          (decodedText) => {
-            // If the QR code is scanned, show the decoded result
-            document.getElementById("status").innerText = "Scanned: " + decodedText;
-            qrCodeScanner.stop();  // Stop scanning after a successful scan
-          },
-          (errorMessage) => {
-            console.warn("Scan Error: " + errorMessage);
-          }
-        ).then(() => {
-          document.getElementById("status").innerText = "Please scan a QR code.";
-        }).catch((error) => {
-          console.error("Scanner failed to start:", error);
-          document.getElementById("status").innerText = "❌ Failed to start scanner. Please check camera permissions.";
-        });
+    // Check for available cameras and initiate scanning
+    function startScanner() {
+      Html5Qrcode.getCameras().then(cameras => {
+        if (cameras && cameras.length > 0) {
+          // Choose the rear camera by default (facingMode: "environment")
+          qrCodeScanner.start(
+            { facingMode: "environment" }, // Use rear camera
+            { fps: 10, qrbox: 250 }, // FPS and size of QR box
+            (decodedText) => {
+              // Successfully scanned QR code
+              document.getElementById("status").innerText = "Scanned: " + decodedText;
+              qrCodeScanner.stop(); // Stop scanning after successful scan
+            },
+            (errorMessage) => {
+              // Display error messages (if any)
+              console.warn("Scan Error: " + errorMessage);
+            }
+          ).then(() => {
+            // Status update when scanner starts
+            document.getElementById("status").innerText = "Please scan a QR code.";
+          }).catch((error) => {
+            // Handle errors while starting the scanner
+            console.error("Scanner failed to start:", error);
+            document.getElementById("status").innerText = "❌ Failed to start scanner. Please check camera permissions.";
+          });
+        } else {
+          // No cameras found on the device
+          document.getElementById("status").innerText = "❌ No camera found. Please ensure your device has a camera.";
+        }
+      }).catch(err => {
+        // Error accessing the camera
+        console.error("Camera access failed:", err);
+        document.getElementById("status").innerText = "❌ Camera access failed. Please allow camera permissions.";
+      });
+    }
+
+    // Initialize scanner when page loads
+    window.onload = function() {
+      // Check for Chrome-specific issues (e.g., camera access on mobile)
+      if (navigator.userAgent.includes("Chrome") && navigator.vendor.includes("Google Inc")) {
+        // Call the function to start the scanner
+        startScanner();
       } else {
-        // No cameras found on the device
-        document.getElementById("status").innerText = "❌ No camera found. Please ensure your device has a camera.";
+        // Show a message for browsers other than Chrome
+        document.getElementById("status").innerText = "⚠️ Please use Google Chrome for the best experience.";
       }
-    }).catch(err => {
-      // Error accessing the camera
-      console.error("Camera access failed:", err);
-      document.getElementById("status").innerText = "❌ Camera access failed. Please allow camera permissions.";
-    });
+    };
   </script>
 </body>
 </html>
