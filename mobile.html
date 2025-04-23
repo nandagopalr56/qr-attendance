@@ -11,7 +11,8 @@
       margin-top: 30px;
     }
     #reader {
-      width: 300px;
+      width: 100%;
+      max-width: 400px;
       margin: auto;
       border: 2px solid #ccc;
       padding: 10px;
@@ -29,30 +30,38 @@
   <div id="status">Initializing scanner...</div>
 
   <script>
-    // Test loading of html5-qrcode and camera access
+    // Initialize the HTML5 QR Code Scanner
     const qrCodeScanner = new Html5Qrcode("reader");
 
     // Check for available cameras
     Html5Qrcode.getCameras().then(cameras => {
       if (cameras && cameras.length > 0) {
-        // Camera found, now starting the scanner
+        // Start the scanner with the first available camera
         qrCodeScanner.start(
-          { facingMode: "environment" },
-          { fps: 10, qrbox: 250 },
+          { facingMode: "environment" }, // Using the rear camera
+          { fps: 10, qrbox: 250 }, // Frame rate and size of the scanning box
           (decodedText) => {
+            // If the QR code is scanned, show the decoded result
             document.getElementById("status").innerText = "Scanned: " + decodedText;
+            qrCodeScanner.stop();  // Stop scanning after a successful scan
           },
           (errorMessage) => {
-            console.warn(`Scanner error: ${errorMessage}`);
+            console.warn("Scan Error: " + errorMessage);
           }
-        );
+        ).then(() => {
+          document.getElementById("status").innerText = "Please scan a QR code.";
+        }).catch((error) => {
+          console.error("Scanner failed to start:", error);
+          document.getElementById("status").innerText = "❌ Failed to start scanner. Please check camera permissions.";
+        });
       } else {
-        document.getElementById("status").innerText = "❌ No camera found.";
+        // No cameras found on the device
+        document.getElementById("status").innerText = "❌ No camera found. Please ensure your device has a camera.";
       }
     }).catch(err => {
-      // Catch errors related to camera access
-      console.error("Camera access failed", err);
-      document.getElementById("status").innerText = "❌ Camera access failed.";
+      // Error accessing the camera
+      console.error("Camera access failed:", err);
+      document.getElementById("status").innerText = "❌ Camera access failed. Please allow camera permissions.";
     });
   </script>
 </body>
