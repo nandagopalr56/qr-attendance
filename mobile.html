@@ -26,9 +26,10 @@
 <body>
   <h2>Scan QR to Mark Attendance</h2>
   <div id="reader"></div>
-  <div id="status"></div>
+  <div id="status">Initializing scanner...</div>
 
   <script>
+    // ✅ Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyBENDNpKZPR40mg4HhhhhiQyoz08Sq4yO8",
       authDomain: "qr-code-based-attendance-befb1.firebaseapp.com",
@@ -41,6 +42,7 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
+    // ✅ Mark Attendance Function
     function markAttendance() {
       const now = new Date();
       const time = now.toLocaleTimeString();
@@ -49,30 +51,37 @@
         status: "Present",
         time: time,
         date: date
+      }).then(() => {
+        document.getElementById("status").innerText = `✅ Attendance Marked at ${time}`;
+      }).catch(error => {
+        document.getElementById("status").innerText = "❌ Failed to mark attendance.";
+        console.error("Database error:", error);
       });
-      document.getElementById("status").innerText = "Attendance Marked Successfully!";
     }
 
+    // ✅ QR Scanner Initialization
     const qrCodeScanner = new Html5Qrcode("reader");
+
     Html5Qrcode.getCameras().then(cameras => {
-      if (cameras && cameras.length) {
+      if (cameras && cameras.length > 0) {
         qrCodeScanner.start(
           { facingMode: "environment" },
           { fps: 10, qrbox: 250 },
-          (decodedText, decodedResult) => {
+          (decodedText) => {
+            document.getElementById("status").innerText = `Scanned: ${decodedText}`;
             markAttendance();
-            qrCodeScanner.stop(); // Prevent multiple scans
+            qrCodeScanner.stop();
           },
-          errorMessage => {
-            console.warn(`Scan error: ${errorMessage}`);
+          (errorMessage) => {
+            // Silent scan errors
           }
         );
       } else {
-        alert("No cameras found.");
+        document.getElementById("status").innerText = "❌ No camera found.";
       }
     }).catch(err => {
-      console.error("Camera access failed", err);
-      alert("Camera access is required to scan QR codes.");
+      console.error("Camera error:", err);
+      document.getElementById("status").innerText = "❌ Camera access error.";
     });
   </script>
 </body>
