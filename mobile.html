@@ -3,8 +3,6 @@
 <head>
   <title>QR Attendance Scanner</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script src="https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script>
   <style>
     body {
@@ -15,6 +13,8 @@
     #reader {
       width: 300px;
       margin: auto;
+      border: 2px solid #ccc;
+      padding: 10px;
     }
     #status {
       margin-top: 20px;
@@ -29,59 +29,30 @@
   <div id="status">Initializing scanner...</div>
 
   <script>
-    // ✅ Firebase Config
-    const firebaseConfig = {
-      apiKey: "AIzaSyBENDNpKZPR40mg4HhhhhiQyoz08Sq4yO8",
-      authDomain: "qr-code-based-attendance-befb1.firebaseapp.com",
-      databaseURL: "https://qr-code-based-attendance-befb1-default-rtdb.firebaseio.com",
-      projectId: "qr-code-based-attendance-befb1",
-      storageBucket: "qr-code-based-attendance-befb1.appspot.com",
-      messagingSenderId: "636789197305",
-      appId: "1:636789197305:web:646fe72e8219ebd029d528"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    // ✅ Mark Attendance Function
-    function markAttendance() {
-      const now = new Date();
-      const time = now.toLocaleTimeString();
-      const date = now.toLocaleDateString();
-      db.ref("attendance/latest").set({
-        status: "Present",
-        time: time,
-        date: date
-      }).then(() => {
-        document.getElementById("status").innerText = `✅ Attendance Marked at ${time}`;
-      }).catch(error => {
-        document.getElementById("status").innerText = "❌ Failed to mark attendance.";
-        console.error("Database error:", error);
-      });
-    }
-
-    // ✅ QR Scanner Initialization
+    // Test loading of html5-qrcode and camera access
     const qrCodeScanner = new Html5Qrcode("reader");
 
+    // Check for available cameras
     Html5Qrcode.getCameras().then(cameras => {
       if (cameras && cameras.length > 0) {
+        // Camera found, now starting the scanner
         qrCodeScanner.start(
           { facingMode: "environment" },
           { fps: 10, qrbox: 250 },
           (decodedText) => {
-            document.getElementById("status").innerText = `Scanned: ${decodedText}`;
-            markAttendance();
-            qrCodeScanner.stop();
+            document.getElementById("status").innerText = "Scanned: " + decodedText;
           },
           (errorMessage) => {
-            // Silent scan errors
+            console.warn(`Scanner error: ${errorMessage}`);
           }
         );
       } else {
         document.getElementById("status").innerText = "❌ No camera found.";
       }
     }).catch(err => {
-      console.error("Camera error:", err);
-      document.getElementById("status").innerText = "❌ Camera access error.";
+      // Catch errors related to camera access
+      console.error("Camera access failed", err);
+      document.getElementById("status").innerText = "❌ Camera access failed.";
     });
   </script>
 </body>
