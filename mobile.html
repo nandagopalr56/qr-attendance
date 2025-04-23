@@ -38,7 +38,7 @@
       if (cameras && cameras.length > 0) {
         // Start the scanner with the first available camera
         qrCodeScanner.start(
-          { facingMode: "environment" }, // Using the rear camera
+          { facingMode: "environment" }, // Use the rear camera
           { fps: 10, qrbox: 250 }, // Frame rate and size of the scanning box
           (decodedText) => {
             // If the QR code is scanned, show the decoded result
