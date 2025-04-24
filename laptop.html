@@ -1,30 +1,31 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Laptop Attendance Screen</title>
+  <title>QR Attendance - Laptop Display</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  <style>
-    body { font-family: Arial, sans-serif; text-align: center; padding: 40px; }
-    img { width: 600px; height: 600px; object-fit: contain; margin-bottom: 20px; }
-    #status { font-size: 24px; margin-top: 20px; }
-    button { 
-      background: #4CAF50; color: white; border: none; 
-      padding: 20px 50px; font-size: 20px; border-radius: 8px; 
-      cursor: pointer; margin-top: 20px; width: 300px; 
-    }
-    button a { color: white; text-decoration: none; }
-    button:hover { background: #45a049; }
-  </style>
 </head>
-<body>
-  <h1>Scan the QR Code to Mark Attendance</h1>
-  <img src="qr.png" alt="QR Code">
-  <div id="status">Waiting for scan...</div>
- 
+<body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen text-center text-gray-800 px-4">
+
+  <div class="bg-white shadow-xl rounded-xl p-6 w-full max-w-2xl">
+    <h1 class="text-2xl font-bold text-indigo-600 mb-6">Scan QR Code to Mark Attendance</h1>
+    
+    <div class="border-4 border-dashed border-indigo-400 rounded-xl overflow-hidden">
+      <img src="qr.png" alt="QR Code" class="w-full max-w-sm mx-auto object-contain" />
+    </div>
+
+    <div id="status" class="mt-6 text-lg font-medium text-gray-600">
+      ⏳ Waiting for scan...
+    </div>
+  </div>
+
   <script>
-    // Firebase config (same as mobile)
+    // Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyBENDNpKZPR40mg4HhhhhiQyoz08Sq4yO8",
       authDomain: "qr-code-based-attendance-befb1.firebaseapp.com",
@@ -34,15 +35,22 @@
       messagingSenderId: "636789197305",
       appId: "1:636789197305:web:646fe72e8219ebd029d528"
     };
+
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Listen for attendance updates
-    db.ref("attendance/latest").on("value", snap => {
-      const d = snap.val();
-      if (d && d.status === "Marked") {
-        document.getElementById("status").innerText =
-          `✅ Attendance Marked at ${d.time} on ${d.date}`;
+    db.ref("attendance/latest").on("value", snapshot => {
+      const data = snapshot.val();
+      const statusDiv = document.getElementById("status");
+
+      if (data && data.status === true) {
+        statusDiv.innerHTML = `
+          <span class="text-green-600 text-xl font-semibold">✅ Attendance Marked</span><br/>
+          <span class="text-gray-700">Time: <b>${data.time}</b></span><br/>
+          <span class="text-gray-700">Date: <b>${data.date}</b></span>
+        `;
+      } else {
+        statusDiv.innerHTML = `⏳ Waiting for scan...`;
       }
     });
   </script>
