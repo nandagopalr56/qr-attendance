@@ -1,19 +1,35 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Mobile Attendance</title>
+  <meta charset="UTF-8" />
+  <title>Scan QR - Mobile Attendance</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
-  <!-- QR Code Scanner Library -->
+  <!-- QR Scanner -->
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 </head>
-<body>
-  <video id="preview" width="100%" height="auto" style="border: 1px solid black"></video>
+<body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen text-gray-800">
+
+  <div class="bg-white shadow-lg rounded-xl p-4 w-full max-w-sm text-center">
+    <h1 class="text-lg font-bold mb-2">Mobile QR Attendance</h1>
+    <p class="text-sm text-gray-500 mb-4">Point your camera at the QR code to mark attendance.</p>
+
+    <div class="rounded overflow-hidden border-2 border-gray-300">
+      <video id="preview" width="100%" height="auto" class="rounded-md"></video>
+    </div>
+
+    <div id="confirmation" class="mt-4 hidden bg-green-100 text-green-700 px-4 py-2 rounded-md font-semibold">
+      ✅ Attendance Marked!
+    </div>
+  </div>
 
   <script>
-    // Firebase configuration
+    // Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyBENDNpKZPR40mg4HhhhhiQyoz08Sq4yO8",
       authDomain: "qr-code-based-attendance-befb1.firebaseapp.com",
@@ -29,47 +45,41 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Set up the QR scanner
     const video = document.getElementById("preview");
     const canvasElement = document.createElement("canvas");
     const canvas = canvasElement.getContext("2d");
+    const confirmation = document.getElementById("confirmation");
 
-    // Start the video stream
     navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }).then((stream) => {
       video.srcObject = stream;
-      video.setAttribute("playsinline", true); // required to play video inline on iPhone
+      video.setAttribute("playsinline", true);
       video.play();
       requestAnimationFrame(scanQRCode);
     });
 
     function scanQRCode() {
       if (video.readyState === video.HAVE_ENOUGH_DATA) {
-        // Set the canvas size to the video size
         canvasElement.width = video.videoWidth;
         canvasElement.height = video.videoHeight;
         canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
 
-        // Try to decode the QR code
         const imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
         const code = jsQR(imageData.data, canvasElement.width, canvasElement.height);
 
         if (code) {
-          // Successfully detected a QR code, mark attendance with date & time
-          const currentDate = new Date();
-          const date = currentDate.toLocaleDateString();
-          const time = currentDate.toLocaleTimeString();
-          
-          // Store the data in Firebase
+          const now = new Date();
+          const date = now.toLocaleDateString();
+          const time = now.toLocaleTimeString();
+
           db.ref("attendance/latest").set({
             date: date,
             time: time,
             status: true
           });
 
-          alert("Attendance Marked!");
+          confirmation.classList.remove("hidden");
         }
       }
-
       requestAnimationFrame(scanQRCode);
     }
   </script>
